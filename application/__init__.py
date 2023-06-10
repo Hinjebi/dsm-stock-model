@@ -35,7 +35,6 @@ def get_historical_data(symbol, start_date = None):
     raw_df = requests.get(api_url).json()
     df = pd.DataFrame(raw_df[f'Time Series (Daily)']).T
     df = df.rename(columns = {'1. open': 'open', '2. high': 'high', '3. low': 'low', '4. close': 'close', '5. adjusted close': 'adj close', '6. volume': 'volume'})
-    #print(df)
     for i in df.columns:
         df[i] = df[i].astype(float)
     df.index = pd.to_datetime(df.index)
@@ -51,10 +50,11 @@ def predict():
     #get data from request
     data = request.get_json(force=True)
     ticker = data['ticker']
-    valid_tickers = ['MVRS', 'AMZN', 'AAPL']
+    #valid_tickers = ['MVRS', 'AMZN', 'AAPL']
 
-    if ticker not in valid_tickers:
-        return Response(json.dumps({'error': 'Invalid ticker symbol. Please enter MVRS for Meta, AMZN for Amazon, or AAPL for Apple.'}), status=400)
+    #if ticker not in valid_tickers:
+    #    return Response(json.dumps({'error': 'Invalid ticker symbol. Please enter MVRS for Meta, AMZN for Amazon, or AAPL for Apple.'}), status=400)
+    
     df = get_historical_data(data['ticker'], "2019-01-01")
     average = np.average(df['open'])
     #median = np.median(df['open'])
