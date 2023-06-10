@@ -10,31 +10,32 @@ from sklearn.preprocessing import MinMaxScaler
 # from keras.layers import LSTM
 # from keras.layers import Dense
 
-def get_apikey(key_name, json_filename='secret.json'):
-    BASE_DIR = Path(__file__).resolve().parent
-    json_filepath = os.path.join(BASE_DIR, json_filename)
-
-    if(not os.path.isfile(json_filepath)):
-        print("JSON File Not Found")
-        raise FileNotFoundError
-
-    with open(json_filepath) as f:
-        json_p = json.loads(f)
-
-    try:
-        value=json_p[key_name]
-        return value
-    except KeyError:
-
-        error_msg = "ERROR: Unvalid Key"
-        return error_msg
+# def get_apikey(key_name, json_filename='secret.json'):
+#     BASE_DIR = Path(__file__).resolve().parent
+#     json_filepath = os.path.join(BASE_DIR, json_filename)
+#
+#     if(not os.path.isfile(json_filepath)):
+#         print("JSON File Not Found")
+#         raise FileNotFoundError
+#
+#     with open(json_filepath) as f:
+#         json_p = json.loads(f)
+#
+#     try:
+#         value=json_p[key_name]
+#         return value
+#     except KeyError:
+#
+#         error_msg = "ERROR: Unvalid Key"
+#         return error_msg
 
 def get_historical_data(symbol, start_date = None):
-    api_key = get_apikey('API_KEY')
+    api_key = open(r'api_key.txt')
     api_url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={api_key}&outputsize=full'
     raw_df = requests.get(api_url).json()
     df = pd.DataFrame(raw_df[f'Time Series (Daily)']).T
     df = df.rename(columns = {'1. open': 'open', '2. high': 'high', '3. low': 'low', '4. close': 'close', '5. adjusted close': 'adj close', '6. volume': 'volume'})
+    #print(df)
     for i in df.columns:
         df[i] = df[i].astype(float)
     df.index = pd.to_datetime(df.index)
