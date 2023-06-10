@@ -1,15 +1,36 @@
 # import keras.layers
+import os
 import pandas as pd
 import numpy as np
 import requests
 from flask import Flask, request, Response, json
+from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
 # from keras.models import Sequential
 # from keras.layers import LSTM
 # from keras.layers import Dense
 
+def get_apikey(key_name, json_filename='secret.json'):
+    BASE_DIR = Path(__file__).resolve().parent
+    json_filepath = os.path.join(BASE_DIR, json_filename)
+
+    if(not os.path.isfile(json_filepath)):
+        print("JSON File Not Found")
+        raise FileNotFoundError
+
+    with open(json_filepath) as f:
+        json_p = json.loads(f)
+
+    try:
+        value=json_p[key_name]
+        return value
+    except KeyError:
+
+        error_msg = "ERROR: Unvalid Key"
+        return error_msg
+
 def get_historical_data(symbol, start_date = None):
-    api_key = open(r'api_key.txt')
+    api_key = get_apikey('API_KEY')
     api_url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={api_key}&outputsize=full'
     raw_df = requests.get(api_url).json()
     df = pd.DataFrame(raw_df[f'Time Series (Daily)']).T
@@ -42,7 +63,8 @@ def predict():
         'average_open_price': average
     }
     return Response(json.dumps(average))
-
+if __name__ == "__main__":
+    app.run()
 #
 # def get_historical_data(symbol, start_date = None):
 #     api_key = open(r'api_key.txt')
