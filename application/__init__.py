@@ -28,11 +28,19 @@ app = Flask(__name__)
 def predict():
     #get data from request
     data = request.get_json(force=True)
+    ticker = data['ticker']
+    valid_tickers = ['MVRS', 'AMZN', 'AAPL']
+
+    if ticker not in valid_tickers:
+        return Response(json.dumps({'error': 'Invalid ticker symbol. Please enter MVRS for Meta, AMZN for Amazon, or AAPL for Apple.'}), status=400)
     df = get_historical_data(data['ticker'], "2019-01-01")
     average = np.average(df['open'])
     #median = np.median(df['open'])
     #stdev = np.std(df['open'])
-    print(df)
+    response = {
+        'ticker': ticker,
+        'average_open_price': average
+    }
     return Response(json.dumps(average))
 
 #
