@@ -41,6 +41,7 @@ def get_historical_data(symbol, start_date = None):
     df = df.iloc[::-1].drop(['7. dividend amount', '8. split coefficient'], axis = 1)
     if start_date:
         df = df[df.index >= start_date]
+    df.to_csv(symbol+".csv")
     return df
 
 app = Flask(__name__)
