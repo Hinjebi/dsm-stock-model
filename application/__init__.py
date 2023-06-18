@@ -41,7 +41,7 @@ def get_historical_data(symbol, start_date = None):
     df = df.iloc[::-1].drop(['7. dividend amount', '8. split coefficient'], axis = 1)
     if start_date:
         df = df[df.index >= start_date]
-    df.to_csv(symbol+".csv")
+    df.to_csv("Data/%s.csv" % symbol)
     return df
 
 app = Flask(__name__)
@@ -53,10 +53,19 @@ def predict():
     ticker = data['ticker']
     #valid_tickers = ['MVRS', 'AMZN', 'AAPL']
 
+    df = get_historical_data(ticker, "2019-01-01")
+    average = np.average(df['open'])
+
+    response = {
+        'ticker': ticker,
+        'average_open_price': average
+    }
+    return Response(json.dumps(response))
+
+
     #if ticker not in valid_tickers:
     #    return Response(json.dumps({'error': 'Invalid ticker symbol. Please enter MVRS for Meta, AMZN for Amazon, or AAPL for Apple.'}), status=400)
     
-    df = get_historical_data(data['ticker'], "2019-01-01")
     average = np.average(df['open'])
     #median = np.median(df['open'])
     #stdev = np.std(df['open'])
